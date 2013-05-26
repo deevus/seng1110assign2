@@ -1,0 +1,31 @@
+SongDatabase File
+Song 1
+I Still Haven't Found What I'm Looking For
+U2
+196kB
+441
+Song 2
+Where The Streets Have No Name
+U2
+120kB
+436
+Song 3
+Samba do Aviao
+Marina Lima
+201kB
+447
+Song 4
+Samba do Aviao
+Os Cariocas
+150kB
+238
+Song 5
+Aguas de Marco
+Elis & Tom
+187kB
+332
+Song 6
+Canto de Ossanha
+Baden Powell
+343kB
+652
