@@ -48,15 +48,27 @@ public class Interface {
 		console.close();
 	}
 
-  private void displayOptions(String[] options) {
-    displayOptions(options, "Choose from the following options:");
+  private int optionPrompt(String[] options) {
+    return optionPrompt(options, "Choose from the following options:");
   }
 
-  private void displayOptions(String[] options, String prompt) {
+  private int optionPrompt(String[] options, String prompt) {
     System.out.println(prompt);
     for (int i = 0; i < options.length; i++) {
       System.out.println(options[i]);
     }
+
+    int choice = -1;
+    while (choice < 0) {
+      try {
+        choice = console.nextInt();
+      } catch (Exception e) {
+        System.out.println("Please enter a positive number.");
+        continue;
+      }
+    }
+
+    return choice;
   }
 
 	/*
@@ -73,11 +85,7 @@ public class Interface {
 
 		//until "quit" is chosen, continue to show menu
 		while (option != OPTION_BACK) {
-			//print out menu options
-      displayOptions(options);
-
-			//get the chosen option code
-			option = console.nextInt();
+      option = optionPrompt(options);
 
 			//process option
 			switch (option) {
@@ -183,9 +191,8 @@ public class Interface {
 
     int option = -1;
 		while (option != OPTION_BACK) {
-      displayOptions(options);
+      option = optionPrompt(options);
 
-			option = console.nextInt();
 			switch(option) {
 				case 1: {
 					Playlist pl = addPlaylist();
@@ -314,8 +321,7 @@ public class Interface {
 		//display playlist options
 		int option = -1;
 		while (option != OPTION_BACK) {
-			displayOptions(options, "What would you like to do with this playlist?");
-			option = console.nextInt();
+			option = optionPrompt(options, "What would you like to do with this playlist?");
 
 			switch (option) {
 				case 1: {
@@ -425,7 +431,7 @@ public class Interface {
 				continue;
 
 			//details string - will display playlist details, if no songs, then "Empty"
-			String details = playlist != null ? String.format("Songs: %d; Duration: %d; Size: %dKb", playlist.getTotalSongs(), playlist.getTotalTime(), playlist.getTotalSize()) : "Empty";
+			String details = String.format("Songs: %d; Duration: %d; Size: %dKb", playlist.getTotalSongs(), playlist.getTotalTime(), playlist.getTotalSize());
 
 			//print out option to console
 			System.out.printf("[%d]: %s\n", i + 1, details);
@@ -503,8 +509,7 @@ public class Interface {
 		}
 		
 		System.out.println("[0]: Cancel");
-		int songNum = console.nextInt() - 1;
-		return songNum;
+		return console.nextInt() - 1;
 	}
 
 	/*
@@ -589,7 +594,34 @@ public class Interface {
       }
     } while (duration <= 0);
 
-		Song[] sortedSongs = database.songsShorterThan(duration);
+    String[] filterOptions = {
+        "[1]: Name",
+        "[2]: Artist",
+        "[3]: File Size",
+        "[4]: Duration"
+    };
+
+    Song[] sortedSongs = null;
+    while (sortedSongs == null) {
+      int choice = optionPrompt(filterOptions, "Choose how you would like to order the results:");
+      switch (choice) {
+        case 1:
+          sortedSongs = database.songsLessThanDurationByName(duration);
+          break;
+        case 2:
+          sortedSongs = database.songsLessThanDurationByArtist(duration);
+          break;
+        case 3:
+          sortedSongs = database.songsLessThanDurationByFileSize(duration);
+          break;
+        case 4:
+          sortedSongs = database.songsLessThanDurationByDuration(duration);
+          break;
+        default:
+          System.out.println("Invalid choice, please try again.");
+      }
+    }
+
     int count = 0;
 		for (int i = 0; i < sortedSongs.length; i++) {
       Song song = sortedSongs[i];
@@ -735,9 +767,7 @@ public class Interface {
 
     int option = -1;
     while (option != OPTION_BACK) {
-      displayOptions(options);
-
-      option = console.nextInt();
+      option = optionPrompt(options);
       switch (option) {
         case 1:
           addSongToDatabase();

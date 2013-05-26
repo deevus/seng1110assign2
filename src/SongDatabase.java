@@ -194,7 +194,7 @@ public class SongDatabase {
     Returns all songs in database that are shorter than the given duration.
     They will be sorted alphabetically
    */
-	public Song[] songsShorterThan(int duration) {
+	private Song[] songsLessThan(int duration, Comparator<Song> comparator) {
 		if (logicalSize == 0) return new Song[0];
 
     //filter songs by duration
@@ -211,26 +211,83 @@ public class SongDatabase {
       }
     }
 
-    //create a comparator to compare songs by artist name
-		Comparator<Song> songComp = new Comparator<Song>() {
-			public int compare(Song s1, Song s2) {
-				if (s1 == null) {
-					return -1;
-				} else if(s2 == null) {
-					return 1;
-				}
-				
-				return s1.getArtist().compareToIgnoreCase(s2.getArtist());
-			}
-		};
-		
 		/*
 		 * Sort it
 		 */
-		Arrays.sort(matched, songComp);
+		Arrays.sort(matched, comparator);
 		
 		return matched;
 	}
+
+  private Comparator<Song> artistComparator() {
+    Comparator<Song> songComparator = new Comparator<Song>() {
+      public int compare(Song s1, Song s2) {
+        if (s1 == null) {
+          return -1;
+        } else if(s2 == null) {
+          return 1;
+        }
+
+        return s1.getArtist().compareToIgnoreCase(s2.getArtist());
+      }
+    };
+
+    return songComparator;
+  }
+
+  private Comparator<Song> nameComparator() {
+    Comparator<Song> songComparator = new Comparator<Song>() {
+      public int compare(Song s1, Song s2) {
+        if (s1 == null) {
+          return -1;
+        } else if(s2 == null) {
+          return 1;
+        }
+
+        return s1.getName().compareToIgnoreCase(s2.getName());
+      }
+    };
+
+    return songComparator;
+  }
+
+  private Comparator<Song> fileSizeComparator() {
+    Comparator<Song> songComparator = new Comparator<Song>() {
+      public int compare(Song s1, Song s2) {
+        if (s1 == null) {
+          return -1;
+        } else if(s2 == null) {
+          return 1;
+        }
+
+        if (s1.getFileSize() == s2.getFileSize()) return 0;
+        if (s1.getFileSize() > s2.getFileSize()) return 1;
+
+        return -1;
+      }
+    };
+
+    return songComparator;
+  }
+
+  private Comparator<Song> durationComparator() {
+    Comparator<Song> songComparator = new Comparator<Song>() {
+      public int compare(Song s1, Song s2) {
+        if (s1 == null) {
+          return -1;
+        } else if(s2 == null) {
+          return 1;
+        }
+
+        if (s1.getDuration() == s2.getDuration()) return 0;
+        if (s1.getDuration() > s2.getDuration()) return 1;
+
+        return -1;
+      }
+    };
+
+    return songComparator;
+  }
 
   /*
     Checks if given song is in the database
@@ -243,5 +300,21 @@ public class SongDatabase {
       }
     }
     return false;
+  }
+
+  public Song[] songsLessThanDurationByName(int duration) {
+    return songsLessThan(duration, nameComparator());
+  }
+
+  public Song[] songsLessThanDurationByArtist(int duration) {
+    return songsLessThan(duration, artistComparator());
+  }
+
+  public Song[] songsLessThanDurationByFileSize(int duration) {
+    return songsLessThan(duration, fileSizeComparator());
+  }
+
+  public Song[] songsLessThanDurationByDuration(int duration) {
+    return songsLessThan(duration, durationComparator());
   }
 }
