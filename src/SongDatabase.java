@@ -1,5 +1,10 @@
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Scanner;
 
 public class SongDatabase {
   private static final int SIZE_INCREMENT = 4;
@@ -65,8 +70,7 @@ public class SongDatabase {
       System.arraycopy(arr, 0, expandedArray, 0, arr.length);
 
       return expandedArray;
-    }
-    else {
+    } else {
       //we are making the array smaller
       int halfSize = arr.length / 2;
       int newSize = halfSize > SIZE_INCREMENT ? halfSize : SIZE_INCREMENT;
@@ -182,8 +186,7 @@ public class SongDatabase {
         String songString = String.format("Song %d\n%s\n%s\n%skB\n%d\n", i + 1, song.getName(), song.getArtist(), song.getFileSize(), song.getDuration());
         out.print(songString);
       }
-    }
-    finally {
+    } finally {
       out.close();
     }
 
@@ -224,7 +227,7 @@ public class SongDatabase {
       public int compare(Song s1, Song s2) {
         if (s1 == null) {
           return -1;
-        } else if(s2 == null) {
+        } else if (s2 == null) {
           return 1;
         }
 
@@ -240,7 +243,7 @@ public class SongDatabase {
       public int compare(Song s1, Song s2) {
         if (s1 == null) {
           return -1;
-        } else if(s2 == null) {
+        } else if (s2 == null) {
           return 1;
         }
 
@@ -256,7 +259,7 @@ public class SongDatabase {
       public int compare(Song s1, Song s2) {
         if (s1 == null) {
           return -1;
-        } else if(s2 == null) {
+        } else if (s2 == null) {
           return 1;
         }
 
@@ -275,7 +278,7 @@ public class SongDatabase {
       public int compare(Song s1, Song s2) {
         if (s1 == null) {
           return -1;
-        } else if(s2 == null) {
+        } else if (s2 == null) {
           return 1;
         }
 

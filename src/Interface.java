@@ -1,5 +1,7 @@
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.Scanner;
-import java.io.*;
 
 public class Interface {
   private static final int OPTION_BACK = 0;
@@ -135,7 +137,7 @@ public class Interface {
         if (pl != null) {
           int index = pl.indexOf(song);
           if (index >= 0) {
-            pl.setSong(index, null);
+            pl.removeSong(index);
           }
         }
       }
@@ -201,7 +203,7 @@ public class Interface {
     while (option != OPTION_BACK) {
       option = optionPrompt(options);
 
-      switch(option) {
+      switch (option) {
         case 1: {
           Playlist pl = addPlaylist();
           if (pl != null) {
@@ -302,8 +304,7 @@ public class Interface {
       System.arraycopy(arr, 0, expandedArray, 0, arr.length);
 
       return expandedArray;
-    }
-    else {
+    } else {
       //we are making the array smaller
       int halfSize = arr.length / 2;
       int newSize = halfSize > PLAYLISTS_SIZE_INCREMENT ? halfSize : PLAYLISTS_SIZE_INCREMENT;
@@ -323,11 +324,11 @@ public class Interface {
    */
   private void managePlaylist(Playlist pl) {
     String[] options = {
-      "[1]: View Songs In Playlist",
-      "[2]: Add Song To Playlist",
-      "[3]: Remove Song From Playlist",
-      "[4]: Remove Playlist",
-      String.format("[%d]: Back", OPTION_BACK)
+        "[1]: View Songs In Playlist",
+        "[2]: Add Song To Playlist",
+        "[3]: Remove Song From Playlist",
+        "[4]: Remove Playlist",
+        String.format("[%d]: Back", OPTION_BACK)
     };
 
     //display playlist options
@@ -345,13 +346,18 @@ public class Interface {
           }
           break;
         }
-        case 2: addSongToPlaylist(pl); break;
-        case 3: removeSongFromPlaylist(pl); break;
+        case 2:
+          addSongToPlaylist(pl);
+          break;
+        case 3:
+          removeSongFromPlaylist(pl);
+          break;
         case 4: {
           removePlaylist(pl);
           return; //we can no longer manage this playlist as it's deleted
         }
-        case OPTION_BACK: continue;
+        case OPTION_BACK:
+          continue;
       }
     }
   }
@@ -370,18 +376,21 @@ public class Interface {
 
     //the enum PlaylistActionState informs us of the method result
     Playlist.PlaylistActionState result = pl.addSong(song);
-      switch (result) {
-        case NO_ERROR: break;
-        case ERROR_MAX_TIME_REACHED: {
-          System.out.println("Error: Could not add song. Maximum total time for playlist reached.");
-          break;
-        }
-        case ERROR_MAX_SIZE_REACHED: {
-          System.out.println("Error: Could not add song. Maximum file size for playlist reached");
-          break;
-        }
-        default: System.out.println("Error: Unknown error"); break;
+    switch (result) {
+      case NO_ERROR:
+        break;
+      case ERROR_MAX_TIME_REACHED: {
+        System.out.println("Error: Could not add song. Maximum total time for playlist reached.");
+        break;
       }
+      case ERROR_MAX_SIZE_REACHED: {
+        System.out.println("Error: Could not add song. Maximum file size for playlist reached");
+        break;
+      }
+      default:
+        System.out.println("Error: Unknown error");
+        break;
+    }
   }
 
   /*
@@ -413,8 +422,7 @@ public class Interface {
     int duration = 0;
     do try {
       duration = Integer.parseInt(console.next());
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       continue;
     } while (!checkDuration(duration));
 
@@ -423,8 +431,7 @@ public class Interface {
     int fileSize = -1;
     do try {
       fileSize = Integer.parseInt(console.next());
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       continue;
     } while (!checkFileSize(fileSize));
 
@@ -475,6 +482,7 @@ public class Interface {
     }
     return true;
   }
+
   private boolean checkArtist(String artist) {
     if (artist == null || artist.length() == 0) {
       System.out.println("Artist must have a value and cannot be null");
@@ -482,6 +490,7 @@ public class Interface {
     }
     return true;
   }
+
   private boolean checkFileSize(int fileSize) {
     if (fileSize <= 0) {
       System.out.println("File Size must be a number greater than zero");
@@ -489,6 +498,7 @@ public class Interface {
     }
     return true;
   }
+
   private boolean checkDuration(int duration) {
     if (duration <= 0) {
       System.out.println("Duration must be a number greater than zero");
@@ -574,12 +584,12 @@ public class Interface {
       printSong(i + 1, song);
     }
 
-      if (songCount == 0) {
-        System.out.println("There are no songs in the database.");
-        return DATABASE_EMPTY;
+    if (songCount == 0) {
+      System.out.println("There are no songs in the database.");
+      return DATABASE_EMPTY;
     }
 
-      System.out.println(String.format("[%d]: Cancel", OPTION_BACK));
+    System.out.println(String.format("[%d]: Cancel", OPTION_BACK));
     return console.nextInt() - 1;
   }
 
@@ -600,8 +610,7 @@ public class Interface {
         if (duration <= 0) {
           System.out.println("Please enter a number greater than zero.");
         }
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         continue;
       }
     } while (duration <= 0);
@@ -661,8 +670,7 @@ public class Interface {
     Playlist pl = getPlaylist(i);
     if (pl == null) {
       System.out.println("Incorrect selection.");
-    }
-    else {
+    } else {
       removePlaylist(pl);
     }
   }
@@ -672,7 +680,7 @@ public class Interface {
    */
   private void removePlaylist(Playlist pl) {
     int index = indexOfPlaylist(pl);
-      //set playlist to null
+    //set playlist to null
     playlists[index] = null;
 
     //update logicalSize
@@ -749,8 +757,7 @@ public class Interface {
     int songsLoaded = database.loadSongs(selectedFile);
     if (songsLoaded > 0) {
       System.out.printf("Loaded %d new songs from %s successfully\n", songsLoaded, selectedFile);
-    }
-    else {
+    } else {
       System.out.println("No new songs were loaded from the database.");
       System.out.println("Please note that duplicates will not be loaded.");
     }
@@ -805,8 +812,8 @@ public class Interface {
         case 3:
           try {
             loadDatabaseFromFile();
+          } catch (Exception e) {
           }
-          catch (Exception e) { }
           break;
         case 4:
           saveDatabaseToFile();

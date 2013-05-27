@@ -11,6 +11,7 @@ public class Song {
   public Song() {
     numberOfSongs++;
   }
+
   public Song(String name, String artist, int fileSize, int duration) {
     this();
 
@@ -24,6 +25,7 @@ public class Song {
   public void setName(String value) {
     name = value;
   }
+
   public String getName() {
     return name;
   }
@@ -32,6 +34,7 @@ public class Song {
   public void setArtist(String value) {
     artist = value;
   }
+
   public String getArtist() {
     return artist;
   }
@@ -40,6 +43,7 @@ public class Song {
   public void setFileSize(int value) {
     fileSize = value;
   }
+
   public int getFileSize() {
     return fileSize;
   }
@@ -48,6 +52,7 @@ public class Song {
   public void setDuration(int value) {
     duration = value;
   }
+
   public int getDuration() {
     return duration;
   }

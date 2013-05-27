@@ -61,8 +61,7 @@ public class Playlist {
   public PlaylistActionState setSong(int num, Song song) {
     try {
       songs[num] = song;
-    }
-    catch (ArrayIndexOutOfBoundsException e) {
+    } catch (ArrayIndexOutOfBoundsException e) {
       return PlaylistActionState.ERROR_INVALID_INDEX;
     }
 
@@ -77,8 +76,7 @@ public class Playlist {
   public Song getSong(int num) {
     try {
       return songs[num];
-    }
-    catch (ArrayIndexOutOfBoundsException e) {
+    } catch (ArrayIndexOutOfBoundsException e) {
       return null;
     }
   }
@@ -88,7 +86,7 @@ public class Playlist {
   */
   public int getTotalSize() {
     int totalSize = 0;
-    for (int i = 0;i < logicalSize; i++) {
+    for (int i = 0; i < logicalSize; i++) {
       totalSize += songs[i].getFileSize();
     }
     return totalSize;
@@ -98,9 +96,8 @@ public class Playlist {
     Get the total time of songs in playlist
   */
   public int getTotalTime() {
-    //todo: fix when deleting song from database when in playlist
     int totalTime = 0;
-    for (int i = 0;i < logicalSize; i++) {
+    for (int i = 0; i < logicalSize; i++) {
       totalTime += songs[i].getDuration();
     }
     return totalTime;
@@ -121,6 +118,7 @@ public class Playlist {
   public int getMaxSize() {
     return MAX_SIZE;
   }
+
   public int getMaxTime() {
     return MAX_TIME;
   }
@@ -153,8 +151,7 @@ public class Playlist {
       System.arraycopy(arr, 0, expandedArray, 0, arr.length);
 
       return expandedArray;
-    }
-    else {
+    } else {
       //we are making the array smaller
       int halfSize = arr.length / 2;
       int newSize = halfSize > SIZE_INCREMENT ? halfSize : SIZE_INCREMENT;
@@ -209,4 +206,5 @@ public class Playlist {
       //resize the array
       songs = resizeArray(false, songs);
     }
-  }}
+  }
+}
