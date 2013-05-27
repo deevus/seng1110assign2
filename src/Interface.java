@@ -48,10 +48,18 @@ public class Interface {
 		console.close();
 	}
 
+  /*
+    Used to display options provided through String[] parameter.
+    Displays a default prompt
+   */
   private int optionPrompt(String[] options) {
     return optionPrompt(options, "Choose from the following options:");
   }
 
+  /*
+    Used to display options provided through String[] parameter.
+    Will use the provided prompt
+   */
   private int optionPrompt(String[] options, String prompt) {
     System.out.println(prompt);
     for (int i = 0; i < options.length; i++) {
@@ -265,10 +273,11 @@ public class Interface {
     return newPlaylist;
 	}
 
+  /*
+    Finds index of first empty playlist in playlist array
+   */
   private int indexOfFirstEmptyPlaylist() {
 		//reverse loop because there will only be at most 4 empty slots at the end of the array
-		//this has a maximum of O(4) complexity
-		//a forward loop would have O(n + 1) complexity
 		for (int i = playlists.length - 1; i >= 0; i--) {
 			if (playlists[i] != null) {
 				return i + 1;
@@ -278,6 +287,9 @@ public class Interface {
 		return 0;
 	}
 
+  /*
+    Resizes playlist array
+   */
 	private Playlist[] resizeArray(boolean expanding, Playlist[] arr) {
 		if (expanding) {
 			//increase size by set increment
@@ -695,34 +707,45 @@ public class Interface {
 		
 		return -1;
 	}
-	
+
+  /*
+    Prompts the user to choose a song database file
+    Then loads it into database object
+    Will only load new songs (duplicates will be ignored)
+   */
 	private void loadDatabaseFromFile() throws ClassNotFoundException, IOException {
 		//list databases in directory
 		File files = new File(System.getProperty("user.dir"));
-		
+
+    //we only want txt files shown
 		FilenameFilter filter = new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
 				return name.toLowerCase().endsWith(".txt");
 			}
 		};
-		
+
+    //removes any files from the list that aren't txt
 		File[] fileList = files.listFiles(filter);
-		
+
 		if (fileList.length == 0) {
 			System.out.println("No databases found");
 			return;
 		} else {
 			System.out.println("Select a database file to load:");
 		}
-		
+
+    //get the selected database
 		String format = "[%d] %s\n";
 		for (int i = 0; i < fileList.length; i++) {
 			System.out.printf(format, i + 1, fileList[i].getName());
 		}
 		int selection = console.nextInt() - 1;
-		
+
+    //load it into a file object
 		File selectedFile = fileList[selection];
+
+    //pass into song database to load in
 		int songsLoaded = database.loadSongs(selectedFile);
     if (songsLoaded > 0) {
       System.out.printf("Loaded %d new songs from %s successfully\n", songsLoaded, selectedFile);
@@ -732,7 +755,11 @@ public class Interface {
       System.out.println("Please note that duplicates will not be loaded.");
     }
 	}
-	
+
+  /*
+    Used to save song database to a file
+    Will prompt user for filename
+   */
 	private void saveDatabaseToFile() {
 		System.out.println("Enter name of database (extension will be added automatically):");
 		String fileName = console.next();
@@ -796,6 +823,10 @@ public class Interface {
     }
   }
 
+  /*
+    Prints all the songs in the database to the console
+    Ordered by index
+   */
   private void listAllSongsInDatabase() {
     for (int i = 0; i < database.getTotalSongs(); i++) {
       printSong(i + 1, database.getSong(i));

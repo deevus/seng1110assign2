@@ -98,6 +98,7 @@ public class Playlist {
     Get the total time of songs in playlist
   */
 	public int getTotalTime() {
+    //todo: fix when deleting song from database when in playlist
 		int totalTime = 0;
 		for (int i = 0;i < logicalSize; i++) {
       totalTime += songs[i].getDuration();
@@ -137,6 +138,9 @@ public class Playlist {
 		return -1;
 	}
 
+  /*
+    Used to resize songs array
+   */
   private Song[] resizeArray(boolean expanding, Song[] arr) {
 		if (expanding) {
 			//increase size by set increment

@@ -52,6 +52,9 @@ public class Song {
 		return duration;
 	}
 
+  /*
+    Songs are considered equal if song name and artist name matches (case insensitive)
+   */
   public boolean equals(Song s) {
     return s.artist.compareToIgnoreCase(this.artist) + s.name.compareToIgnoreCase(this.name) == 0;
   }
