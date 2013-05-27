@@ -61,7 +61,7 @@ public class Interface {
     int choice = -1;
     while (choice < 0) {
       try {
-        choice = console.nextInt();
+        choice = Integer.parseInt(console.next());
       } catch (Exception e) {
         System.out.println("Please enter a positive number.");
         continue;
