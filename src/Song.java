@@ -63,4 +63,15 @@ public class Song {
   public boolean equals(Song s) {
     return s.artist.compareToIgnoreCase(this.artist) + s.name.compareToIgnoreCase(this.name) == 0;
   }
+
+  @Override
+  public String toString() {
+    //details string - will display artist, track name, duration and file size
+    int hours, minutes, seconds;
+    hours = this.getDuration() / 3600;
+    minutes = (this.getDuration() - hours * 3600) / 60;
+    seconds = (this.getDuration() - hours * 3600 - minutes * 60);
+
+    return String.format("%s - %s [%3$02d:%4$02d:%5$02d] (%6$dKb)", this.getArtist(), this.getName(), hours, minutes, seconds, this.getFileSize());
+  }
 }

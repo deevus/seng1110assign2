@@ -78,6 +78,7 @@ public class Interface {
       }
     }
 
+    console.nextLine(); //removes dormant newline characters which can bug future input
     return choice;
   }
 
@@ -122,7 +123,7 @@ public class Interface {
    */
   private void removeSongFromDatabase() {
     //get song to remove from user
-    int songNum = selectSongFromDatabase(database);
+    int songNum = selectSongFromDatabase(database, "Please select a song to remove:");
     if (songNum == -1) return;
     Song song = database.getSong(songNum);
 
@@ -367,8 +368,7 @@ public class Interface {
    */
   private void addSongToPlaylist(Playlist pl) {
     //song selection
-    System.out.println("Select a song to add to the playlist:");
-    int songNum = selectSongFromDatabase(database);
+    int songNum = selectSongFromDatabase(database, "Select a song to add to the playlist:");
     if (songNum < 0) {
       return;
     }
@@ -405,37 +405,57 @@ public class Interface {
 
     //get song name
     System.out.println("Name:");
-    String name;
-    do {
-      name = console.nextLine();
-    } while (!checkName(name));
+    String name = getNameFromUser();
 
     //get song artist
     System.out.println("Artist:");
-    String artist;
-    do {
-      artist = console.nextLine();
-    } while (!checkArtist(artist));
+    String artist = getArtistFromUser();
 
     //get song duration
     System.out.println("Duration:");
-    int duration = 0;
-    do try {
-      duration = Integer.parseInt(console.next());
-    } catch (Exception e) {
-      continue;
-    } while (!checkDuration(duration));
+    int duration = getDurationFromUser();
 
     //get song size
     System.out.println("File Size:");
+    int fileSize = getFileSizeFromUser();
+
+    return new Song(name, artist, fileSize, duration);
+  }
+
+  private int getFileSizeFromUser() {
     int fileSize = -1;
     do try {
       fileSize = Integer.parseInt(console.next());
     } catch (Exception e) {
       continue;
     } while (!checkFileSize(fileSize));
+    return fileSize;
+  }
 
-    return new Song(name, artist, fileSize, duration);
+  private int getDurationFromUser() {
+    int duration = 0;
+    do try {
+      duration = Integer.parseInt(console.next());
+    } catch (Exception e) {
+      continue;
+    } while (!checkDuration(duration));
+    return duration;
+  }
+
+  private String getArtistFromUser() {
+    String artist;
+    do {
+      artist = console.nextLine();
+    } while (!checkArtist(artist));
+    return artist;
+  }
+
+  private String getNameFromUser() {
+    String name;
+    do {
+      name = console.nextLine();
+    } while (!checkName(name));
+    return name;
   }
 
   /*
@@ -526,7 +546,7 @@ public class Interface {
       Song song = pl.getSong(i);
       if (song != null) {
         //print details of song to user
-        printSong(i + 1, song);
+        System.out.println(songDetailsWithIndex(song, i + 1));
       }
     }
 
@@ -543,25 +563,15 @@ public class Interface {
       Song song = pl.getSong(i);
 
       //display song details
-      printSong(i + 1, song);
+      System.out.println(songDetailsWithIndex(song, i + 1));
     }
   }
 
   /*
-   * Print the details of a song to the console
-   * The index will be displayed alongside, and may be used to identify the song
+    Gets String for printing a song to console
    */
-  private void printSong(int index, Song song) {
-    //details string - will display artist, track name, duration and file size
-    int hours, minutes, seconds;
-    hours = song.getDuration() / 3600;
-    minutes = (song.getDuration() - hours * 3600) / 60;
-    seconds = (song.getDuration() - hours * 3600 - minutes * 60);
-
-    String details = String.format("%s - %s [%3$02d:%4$02d:%5$02d] (%6$dKb)", song.getArtist(), song.getName(), hours, minutes, seconds, song.getFileSize());
-
-    //print out option to console
-    System.out.printf("[%d]: %s\n", index, details);
+  private String songDetailsWithIndex(Song song, int index) {
+    return String.format("[%d] %s", index, song.toString());
   }
 
   /*
@@ -569,19 +579,17 @@ public class Interface {
    *
    * Returns the index of the song which can be passed to database.getSong
    */
-  private int selectSongFromDatabase(SongDatabase db) {
+  private int selectSongFromDatabase(SongDatabase db, String prompt) {
+    String[] options = new String[db.getTotalSongs() + 1];
+
     //display songs
     int songCount = 0;
     for (int i = 0; i <= db.getTotalSongs() - 1; i++) {
       //get song object
       Song song = db.getSong(i);
+      songCount++;
 
-      //we don't want to display songs that are null
-      if (song == null)
-        continue;
-      else songCount++;
-
-      printSong(i + 1, song);
+      options[i] = songDetailsWithIndex(song, songCount);
     }
 
     if (songCount == 0) {
@@ -589,8 +597,9 @@ public class Interface {
       return DATABASE_EMPTY;
     }
 
-    System.out.println(String.format("[%d]: Cancel", OPTION_BACK));
-    return console.nextInt() - 1;
+    options[songCount] = String.format("[%d]: Cancel", OPTION_BACK);
+    return optionPrompt(options, prompt) - 1;
+
   }
 
   /*
@@ -648,7 +657,7 @@ public class Interface {
       Song song = sortedSongs[i];
       if (song != null) {
         count++;
-        printSong(count, sortedSongs[i]);
+        System.out.println(songDetailsWithIndex(sortedSongs[i], count));
       }
     }
 
@@ -792,10 +801,11 @@ public class Interface {
     String[] options = {
         "[1]: Add a song",
         "[2]: Remove a song",
-        "[3]: Load from file",
-        "[4]: Save to file",
-        "[5]: List Songs By Duration",
-        "[6]: List All Songs",
+        "[3]: Edit a song",
+        "[4]: Load from file",
+        "[5]: Save to file",
+        "[6]: List Songs By Duration",
+        "[7]: List All Songs",
         String.format("[%d]: Back", OPTION_BACK)
     };
 
@@ -810,22 +820,61 @@ public class Interface {
           removeSongFromDatabase();
           break;
         case 3:
+          editSongInDatabase();
+          break;
+        case 4:
           try {
             loadDatabaseFromFile();
           } catch (Exception e) {
           }
           break;
-        case 4:
+        case 5:
           saveDatabaseToFile();
           break;
-        case 5:
+        case 6:
           listSongsByDuration();
           break;
-        case 6:
+        case 7:
           listAllSongsInDatabase();
           break;
         case OPTION_BACK:
           continue;
+      }
+    }
+  }
+
+  /*
+    Edit a song in the database
+   */
+  private void editSongInDatabase() {
+    int songChoice = selectSongFromDatabase(database, "Select which song you would like to edit:");
+    if (songChoice == OPTION_BACK - 1) return;
+
+    Song song = database.getSong(songChoice);
+    String[] editOptions = {
+        "[1]: Name",
+        "[2]: Artist",
+        String.format("[%d]: End Editing", OPTION_BACK)
+    };
+
+    int editChoice = -1;
+    while (editChoice != OPTION_BACK) {
+      editChoice = optionPrompt(editOptions, "What would you like to edit?");
+      switch (editChoice) {
+        case OPTION_BACK:
+          return;
+        case 1:
+          System.out.println("Enter a new name:");
+          String name = getNameFromUser();
+          song.setName(name);
+          System.out.println("Name updated successfully.");
+          break;
+        case 2:
+          System.out.println("Enter new artist name:");
+          String artist = getArtistFromUser();
+          song.setArtist(artist);
+          System.out.println("Artist updated successfully.");
+          break;
       }
     }
   }
@@ -836,7 +885,7 @@ public class Interface {
    */
   private void listAllSongsInDatabase() {
     for (int i = 0; i < database.getTotalSongs(); i++) {
-      printSong(i + 1, database.getSong(i));
+      System.out.println(songDetailsWithIndex(database.getSong(i), i + 1));
     }
   }
 }
