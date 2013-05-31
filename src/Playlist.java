@@ -18,8 +18,7 @@ public class Playlist {
   public enum PlaylistActionState {
     NO_ERROR,
     ERROR_MAX_TIME_REACHED,
-    ERROR_MAX_SIZE_REACHED,
-    ERROR_INVALID_INDEX
+    ERROR_MAX_SIZE_REACHED
   }
 
   /*
@@ -52,19 +51,6 @@ public class Playlist {
     }
 
     logicalSize++;
-    return PlaylistActionState.NO_ERROR;
-  }
-
-  /*
-    Getters and Setters for private members
-  */
-  public PlaylistActionState setSong(int num, Song song) {
-    try {
-      songs[num] = song;
-    } catch (ArrayIndexOutOfBoundsException e) {
-      return PlaylistActionState.ERROR_INVALID_INDEX;
-    }
-
     return PlaylistActionState.NO_ERROR;
   }
 
@@ -109,18 +95,6 @@ public class Playlist {
   */
   public int getTotalSongs() {
     return logicalSize;
-  }
-
-  /*
-    Getters for constants
-    Could be changed to variable in future
-  */
-  public int getMaxSize() {
-    return MAX_SIZE;
-  }
-
-  public int getMaxTime() {
-    return MAX_TIME;
   }
 
   /*

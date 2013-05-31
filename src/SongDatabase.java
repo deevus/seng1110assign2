@@ -1,5 +1,4 @@
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
@@ -93,13 +92,6 @@ public class SongDatabase {
   }
 
   /*
-   * Setter for songs given an index
-   */
-  public void setSong(int index, Song song) {
-    allSongs[index] = song;
-  }
-
-  /*
    * Removes a song from the database
    */
   public void removeSong(int index) {
@@ -138,7 +130,7 @@ public class SongDatabase {
   /*
     Load songs into array from given file
   */
-  public int loadSongs(File dataFile) throws FileNotFoundException, IOException, ClassNotFoundException {
+  public int loadSongs(File dataFile) throws IOException, ClassNotFoundException {
     Scanner fileScanner = new Scanner(dataFile);
 
     //confirm that we have a songdb file
@@ -223,7 +215,7 @@ public class SongDatabase {
   }
 
   private Comparator<Song> artistComparator() {
-    Comparator<Song> songComparator = new Comparator<Song>() {
+    return new Comparator<Song>() {
       public int compare(Song s1, Song s2) {
         if (s1 == null) {
           return -1;
@@ -234,12 +226,10 @@ public class SongDatabase {
         return s1.getArtist().compareToIgnoreCase(s2.getArtist());
       }
     };
-
-    return songComparator;
   }
 
   private Comparator<Song> nameComparator() {
-    Comparator<Song> songComparator = new Comparator<Song>() {
+    return new Comparator<Song>() {
       public int compare(Song s1, Song s2) {
         if (s1 == null) {
           return -1;
@@ -250,12 +240,10 @@ public class SongDatabase {
         return s1.getName().compareToIgnoreCase(s2.getName());
       }
     };
-
-    return songComparator;
   }
 
   private Comparator<Song> fileSizeComparator() {
-    Comparator<Song> songComparator = new Comparator<Song>() {
+    return new Comparator<Song>() {
       public int compare(Song s1, Song s2) {
         if (s1 == null) {
           return -1;
@@ -269,12 +257,10 @@ public class SongDatabase {
         return -1;
       }
     };
-
-    return songComparator;
   }
 
   private Comparator<Song> durationComparator() {
-    Comparator<Song> songComparator = new Comparator<Song>() {
+    return new Comparator<Song>() {
       public int compare(Song s1, Song s2) {
         if (s1 == null) {
           return -1;
@@ -288,8 +274,6 @@ public class SongDatabase {
         return -1;
       }
     };
-
-    return songComparator;
   }
 
   /*

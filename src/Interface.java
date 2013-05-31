@@ -8,9 +8,9 @@ public class Interface {
   private static final int DATABASE_EMPTY = -1;
   private static final int PLAYLISTS_SIZE_INCREMENT = 4;
 
-  private Scanner console;
+  private final Scanner console;
   private Playlist[] playlists;
-  private SongDatabase database;
+  private final SongDatabase database;
   private int logicalSize;
 
   /*
@@ -74,7 +74,6 @@ public class Interface {
         choice = Integer.parseInt(console.nextLine());
       } catch (Exception e) {
         System.out.println("Please enter a positive number.");
-        continue;
       }
     }
 
@@ -210,41 +209,41 @@ public class Interface {
       option = optionPrompt(options);
 
       switch (option) {
-        case 1: {
+        case 1:
           Playlist pl = addPlaylist();
           if (pl != null) {
             managePlaylist(pl);
           }
           break;
-        }
-        case 2: {
-          if (getTotalPlaylists() == 0) {
-            System.out.println("There are no playlists in the system. You need to create one first.");
-            break;
-          }
-
-          System.out.println("Select a playlist to manage:");
-          int playlistNum = selectPlaylist();
-          if (playlistNum < 0) {
-            break;
-          }
-          Playlist playlist = getPlaylist(playlistNum);
-          if (playlist != null) {
-            managePlaylist(playlist);
-          }
+        case 2:
+          selectAndManagePlaylist();
           break;
-        }
-        case 3: {
+        case 3:
           selectAndRemovePlaylist();
           break;
-        }
-        case OPTION_BACK: {
-          continue;
-        }
       }
     }
+  }
 
+  /*
+    Prompts user to select a playlist
+    Which they can then manage using the provided menu
+   */
+  private void selectAndManagePlaylist() {
+    if (getTotalPlaylists() == 0) {
+      System.out.println("There are no playlists in the system. You need to create one first.");
+      return;
+    }
 
+    System.out.println("Select a playlist to manage:");
+    int playlistNum = selectPlaylist();
+    if (playlistNum < 0) {
+      return;
+    }
+    Playlist playlist = getPlaylist(playlistNum);
+    if (playlist != null) {
+      managePlaylist(playlist);
+    }
   }
 
   /*
@@ -343,7 +342,7 @@ public class Interface {
       option = optionPrompt(options, "What would you like to do with this playlist?");
 
       switch (option) {
-        case 1: {
+        case 1:
           //only attempt to print if playlist has songs
           if (pl.getTotalSongs() > 0) {
             printAllSongs(pl);
@@ -351,19 +350,15 @@ public class Interface {
             System.out.println("This playlist has no songs.");
           }
           break;
-        }
         case 2:
           addSongToPlaylist(pl);
           break;
         case 3:
           removeSongFromPlaylist(pl);
           break;
-        case 4: {
+        case 4:
           removePlaylist(pl);
           return; //we can no longer manage this playlist as it's deleted
-        }
-        case OPTION_BACK:
-          continue;
       }
     }
   }
@@ -414,11 +409,11 @@ public class Interface {
     String artist = getArtistFromUser();
 
     //get song duration
-    System.out.println("Duration:");
+    System.out.println("Duration (seconds):");
     int duration = getDurationFromUser();
 
     //get song size
-    System.out.println("File Size:");
+    System.out.println("File Size (kB):");
     int fileSize = getFileSizeFromUser();
 
     return new Song(name, artist, fileSize, duration);
@@ -429,7 +424,7 @@ public class Interface {
     do try {
       fileSize = Integer.parseInt(console.nextLine());
     } catch (Exception e) {
-      continue;
+      //do nothing
     } while (!checkFileSize(fileSize));
     return fileSize;
   }
@@ -439,7 +434,7 @@ public class Interface {
     do try {
       duration = Integer.parseInt(console.nextLine());
     } catch (Exception e) {
-      continue;
+      //do nothing
     } while (!checkDuration(duration));
     return duration;
   }
@@ -472,7 +467,7 @@ public class Interface {
       Playlist playlist = getPlaylist(i);
 
       //details string - will display playlist details, if no songs, then "Empty"
-      String details = String.format("Songs: %d; Duration: %d; Size: %dKb", playlist.getTotalSongs(), playlist.getTotalTime(), playlist.getTotalSize());
+      String details = String.format("Songs: %d; Duration (seconds): %d; Size: %dKb", playlist.getTotalSongs(), playlist.getTotalTime(), playlist.getTotalSize());
 
       //print out option to console
       playlistOption[i] = String.format("[%d]: %s", i + 1, details);
@@ -616,18 +611,7 @@ public class Interface {
       return;
     }
 
-    System.out.println("Enter duration ceiling (only songs with a duration less than the ceiling will be shown):");
-    int duration = -1;
-    do {
-      try {
-        duration = Integer.parseInt(console.nextLine());
-        if (duration <= 0) {
-          System.out.println("Please enter a number greater than zero.");
-        }
-      } catch (Exception e) {
-        continue;
-      }
-    } while (duration <= 0);
+    int duration = getDurationCeiling();
 
     String[] filterOptions = {
         "[1]: Name",
@@ -658,17 +642,32 @@ public class Interface {
     }
 
     int count = 0;
-    for (int i = 0; i < sortedSongs.length; i++) {
-      Song song = sortedSongs[i];
+    for (Song song : sortedSongs) {
       if (song != null) {
         count++;
-        System.out.println(songDetailsWithIndex(sortedSongs[i], count));
+        System.out.println(songDetailsWithIndex(song, count));
       }
     }
 
     if (count == 0) {
       System.out.println(String.format("No songs were found with a duration less than %d seconds.", duration));
     }
+  }
+
+  private int getDurationCeiling() {
+    System.out.println("Enter max duration (in seconds) - only songs with a duration less than given will be shown:");
+    int duration = -1;
+    do {
+      try {
+        duration = Integer.parseInt(console.nextLine());
+        if (duration <= 0) {
+          System.out.println("Please enter a number greater than zero.");
+        }
+      } catch (Exception e) {
+        //do nothing
+      }
+    } while (duration <= 0);
+    return duration;
   }
 
   /*
@@ -845,8 +844,6 @@ public class Interface {
         case 7:
           listAllSongsInDatabase();
           break;
-        case OPTION_BACK:
-          continue;
       }
     }
   }
