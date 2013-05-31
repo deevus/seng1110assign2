@@ -195,7 +195,7 @@ public class Playlist {
     //move null index item to the end
     for (int i = index; i < songs.length; i++) {
       if (songs.length == i + 1 || songs[i + 1] == null) {
-        return;
+        break;
       }
 
       songs[i] = songs[i + 1];

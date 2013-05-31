@@ -115,7 +115,7 @@ public class SongDatabase {
     //move null index item to the end
     for (int i = index; i < allSongs.length; i++) {
       if (allSongs.length == i + 1 || allSongs[i + 1] == null) {
-        return;
+        break;
       }
 
       allSongs[i] = allSongs[i + 1];

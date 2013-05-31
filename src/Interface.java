@@ -71,14 +71,13 @@ public class Interface {
     int choice = -1;
     while (choice < 0) {
       try {
-        choice = Integer.parseInt(console.next());
+        choice = Integer.parseInt(console.nextLine());
       } catch (Exception e) {
         System.out.println("Please enter a positive number.");
         continue;
       }
     }
 
-    console.nextLine(); //removes dormant newline characters which can bug future input
     return choice;
   }
 
@@ -116,6 +115,8 @@ public class Interface {
         }
       }
     }
+
+    System.out.println("Thank you for using iToons music!");
   }
 
   /*
@@ -135,11 +136,15 @@ public class Interface {
       //then remove from any playlists
       for (int i = 0; i < logicalSize; i++) {
         Playlist pl = getPlaylist(i);
+
+        int index;
         if (pl != null) {
-          int index = pl.indexOf(song);
-          if (index >= 0) {
-            pl.removeSong(index);
-          }
+          do {
+            index = pl.indexOf(song);
+            if (index >= 0) {
+              pl.removeSong(index);
+            }
+          } while (index >= 0);
         }
       }
 
@@ -398,9 +403,6 @@ public class Interface {
    * Uses check methods to validate input
    */
   private Song getSongFromUser() {
-    //clear buffer
-    console.nextLine();
-
     System.out.println("Please enter song details...");
 
     //get song name
@@ -425,7 +427,7 @@ public class Interface {
   private int getFileSizeFromUser() {
     int fileSize = -1;
     do try {
-      fileSize = Integer.parseInt(console.next());
+      fileSize = Integer.parseInt(console.nextLine());
     } catch (Exception e) {
       continue;
     } while (!checkFileSize(fileSize));
@@ -435,7 +437,7 @@ public class Interface {
   private int getDurationFromUser() {
     int duration = 0;
     do try {
-      duration = Integer.parseInt(console.next());
+      duration = Integer.parseInt(console.nextLine());
     } catch (Exception e) {
       continue;
     } while (!checkDuration(duration));
@@ -463,21 +465,21 @@ public class Interface {
    */
   private int selectPlaylist() {
     //display playlists
+    String[] playlistOption = new String[logicalSize + 1];
+
     for (int i = 0; i < logicalSize; i++) {
-      //get song object
+      //get playlist object
       Playlist playlist = getPlaylist(i);
-      if (playlist == null)
-        continue;
 
       //details string - will display playlist details, if no songs, then "Empty"
       String details = String.format("Songs: %d; Duration: %d; Size: %dKb", playlist.getTotalSongs(), playlist.getTotalTime(), playlist.getTotalSize());
 
       //print out option to console
-      System.out.printf("[%d]: %s\n", i + 1, details);
+      playlistOption[i] = String.format("[%d]: %s", i + 1, details);
     }
 
-    System.out.println(String.format("[%d]: Cancel", OPTION_BACK));
-    return console.nextInt() - 1;
+    playlistOption[logicalSize] = String.format("[%d]: Cancel", OPTION_BACK);
+    return optionPrompt(playlistOption, "Choose a playlist:") - 1;
   }
 
   /*
@@ -541,17 +543,20 @@ public class Interface {
     }
 
     //display songs
-    for (int i = 0; i < pl.getTotalSongs(); i++) {
+    int totalSongs = pl.getTotalSongs();
+    String[] songOptions = new String[totalSongs + 1];
+
+    for (int i = 0; i < totalSongs; i++) {
       //get song object
       Song song = pl.getSong(i);
       if (song != null) {
         //print details of song to user
-        System.out.println(songDetailsWithIndex(song, i + 1));
+        songOptions[i] = songDetailsWithIndex(song, i + 1);
       }
     }
 
-    System.out.println("[0]: Cancel");
-    return console.nextInt() - 1;
+    songOptions[totalSongs] = String.format("[%d]: Cancel", OPTION_BACK);
+    return optionPrompt(songOptions, "Select a song:") - 1;
   }
 
   /*
@@ -615,7 +620,7 @@ public class Interface {
     int duration = -1;
     do {
       try {
-        duration = console.nextInt();
+        duration = Integer.parseInt(console.nextLine());
         if (duration <= 0) {
           System.out.println("Please enter a number greater than zero.");
         }
@@ -662,7 +667,7 @@ public class Interface {
     }
 
     if (count == 0) {
-      System.out.printf("No songs were found with a duration less than %d seconds.\n", duration);
+      System.out.println(String.format("No songs were found with a duration less than %d seconds.", duration));
     }
   }
 
@@ -676,6 +681,8 @@ public class Interface {
     }
 
     int i = selectPlaylist();
+    if (i == -1) return;
+
     Playlist pl = getPlaylist(i);
     if (pl == null) {
       System.out.println("Incorrect selection.");
@@ -748,16 +755,16 @@ public class Interface {
     if (fileList.length == 0) {
       System.out.println("No databases found");
       return;
-    } else {
-      System.out.println("Select a database file to load:");
     }
 
     //get the selected database
-    String format = "[%d] %s\n";
+    String[] options = new String[fileList.length];
+
+    String format = "[%d] %s";
     for (int i = 0; i < fileList.length; i++) {
-      System.out.printf(format, i + 1, fileList[i].getName());
+      options[i] = String.format(format, i + 1, fileList[i].getName());
     }
-    int selection = console.nextInt() - 1;
+    int selection = optionPrompt(options, "Select a database to load:") - 1;
 
     //load it into a file object
     File selectedFile = fileList[selection];
@@ -765,7 +772,7 @@ public class Interface {
     //pass into song database to load in
     int songsLoaded = database.loadSongs(selectedFile);
     if (songsLoaded > 0) {
-      System.out.printf("Loaded %d new songs from %s successfully\n", songsLoaded, selectedFile);
+      System.out.println(String.format("Loaded %d new songs from %s successfully", songsLoaded, selectedFile));
     } else {
       System.out.println("No new songs were loaded from the database.");
       System.out.println("Please note that duplicates will not be loaded.");
@@ -778,7 +785,7 @@ public class Interface {
    */
   private void saveDatabaseToFile() {
     System.out.println("Enter name of database (extension will be added automatically):");
-    String fileName = console.next();
+    String fileName = console.nextLine();
 
     //get the application path
     String appPath = System.getProperty("user.dir");
@@ -787,7 +794,7 @@ public class Interface {
       String destination = String.format("%s/%s", appPath, fileName);
       boolean saveResult = database.saveToFile(destination);
       if (saveResult) {
-        System.out.printf("Database saved successfully to %s successfully\n", destination);
+        System.out.println(String.format("Database saved successfully to %s successfully", destination));
       }
     } catch (IOException e) {
       System.out.println("There was an error saving database to file: " + e.getMessage());
@@ -826,6 +833,7 @@ public class Interface {
           try {
             loadDatabaseFromFile();
           } catch (Exception e) {
+            System.out.println("Error loading database.");
           }
           break;
         case 5:
